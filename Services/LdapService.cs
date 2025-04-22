@@ -19,7 +19,7 @@ namespace open_consult_challenge.Services
             string ouName = "groups";
             string groupDn = $"cn={group.Identifier},ou={ouName},{_baseDn}";
 
-            var request = new AddRequest(groupDn,
+            AddRequest request = new AddRequest(groupDn,
                 new DirectoryAttribute("objectClass", "top", "groupOfNames"),
                 new DirectoryAttribute("cn", group.Identifier),
                 new DirectoryAttribute("description", group.Description ?? ""),
@@ -44,7 +44,7 @@ namespace open_consult_challenge.Services
 
             string sn = user.FullName.Split(' ').LastOrDefault() ?? ".";
 
-            var request = new AddRequest(userDn,
+            AddRequest request = new AddRequest(userDn,
                 new DirectoryAttribute("objectClass", "top", "person", "organizationalPerson", "inetOrgPerson"),
                 new DirectoryAttribute("uid", user.Login),
                 new DirectoryAttribute("cn", user.FullName),
@@ -65,18 +65,18 @@ namespace open_consult_challenge.Services
             }
 
             // Adiciona o usuário aos grupos logo após a criação
-            foreach (var groupName in user.Groups)
+            foreach (string groupName in user.Groups)
             {
                 string groupDn = $"cn={groupName},ou=groups,{_baseDn}";
 
-                var addModification = new DirectoryAttributeModification
+                DirectoryAttributeModification addModification = new DirectoryAttributeModification
                 {
                     Name = "member",
                     Operation = DirectoryAttributeOperation.Add
                 };
                 addModification.Add(userDn);
 
-                var modifyRequest = new ModifyRequest(groupDn, addModification);
+                ModifyRequest modifyRequest = new ModifyRequest(groupDn, addModification);
 
                 try
                 {
@@ -95,11 +95,11 @@ namespace open_consult_challenge.Services
             string userDn = $"uid={mod.Login},ou=users,{_baseDn}";
 
             // Verifica se o usuário existe no LDAP antes de modificar
-            var checkRequest = new SearchRequest(userDn, "(objectClass=inetOrgPerson)", SearchScope.Base);
+            SearchRequest checkRequest = new SearchRequest(userDn, "(objectClass=inetOrgPerson)", SearchScope.Base);
 
             try
             {
-                var response = (SearchResponse)_connection.SendRequest(checkRequest);
+                SearchResponse response = (SearchResponse)_connection.SendRequest(checkRequest);
                 if (response.Entries.Count == 0)
                 {
                     Console.WriteLine($"Usuário '{mod.Login}' não existe. Modificação ignorada.");
@@ -113,18 +113,18 @@ namespace open_consult_challenge.Services
             }
 
             // A partir daqui, usuário existe — pode modificar
-            foreach (var groupName in mod.GroupsToAdd)
+            foreach (string groupName in mod.GroupsToAdd)
             {
                 string groupDn = $"cn={groupName},ou=groups,{_baseDn}";
 
-                var addModification = new DirectoryAttributeModification
+                DirectoryAttributeModification addModification = new DirectoryAttributeModification
                 {
                     Name = "member",
                     Operation = DirectoryAttributeOperation.Add
                 };
                 addModification.Add(userDn);
 
-                var modifyRequest = new ModifyRequest(groupDn, addModification);
+                ModifyRequest modifyRequest = new ModifyRequest(groupDn, addModification);
 
                 try
                 {
@@ -137,18 +137,18 @@ namespace open_consult_challenge.Services
                 }
             }
 
-            foreach (var groupName in mod.GroupsToRemove)
+            foreach (string groupName in mod.GroupsToRemove)
             {
                 string groupDn = $"cn={groupName},ou=groups,{_baseDn}";
 
-                var removeModification = new DirectoryAttributeModification
+                DirectoryAttributeModification removeModification = new DirectoryAttributeModification
                 {
                     Name = "member",
                     Operation = DirectoryAttributeOperation.Delete
                 };
                 removeModification.Add(userDn);
 
-                var modifyRequest = new ModifyRequest(groupDn, removeModification);
+                ModifyRequest modifyRequest = new ModifyRequest(groupDn, removeModification);
 
                 try
                 {

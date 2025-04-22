@@ -26,7 +26,7 @@ namespace open_consult_challenge.Services
 
             string[] xmlFiles = Directory.GetFiles(xmlDirectoryPath, "*.xml");
 
-            foreach (var filePath in xmlFiles)
+            foreach (string filePath in xmlFiles)
             {
                 try
                 {
@@ -113,8 +113,8 @@ namespace open_consult_challenge.Services
             }
 
             // Grupos
-            var groupList = new List<string>();
-            var groupNodes = root.Select("add-attr[@attr-name='Grupo']/value");
+            List<string> groupList = new List<string>();
+            XPathNodeIterator groupNodes = root.Select("add-attr[@attr-name='Grupo']/value");
             while (groupNodes.MoveNext())
             {
                 if (!string.IsNullOrWhiteSpace(groupNodes.Current?.Value))
@@ -145,8 +145,8 @@ namespace open_consult_challenge.Services
                 return null;
             }
 
-            var groupsToRemove = new List<string>();
-            var removeNodes = root.Select("modify-attr[@attr-name='Grupo']/remove-value/value");
+            List<string> groupsToRemove = new List<string>();
+            XPathNodeIterator removeNodes = root.Select("modify-attr[@attr-name='Grupo']/remove-value/value");
             while (removeNodes.MoveNext())
             {
                 if (!string.IsNullOrWhiteSpace(removeNodes.Current?.Value))
@@ -155,8 +155,8 @@ namespace open_consult_challenge.Services
                 }
             }
 
-            var groupsToAdd = new List<string>();
-            var addNodes = root.Select("modify-attr[@attr-name='Grupo']/add-value/value");
+            List<string> groupsToAdd = new List<string>();
+            XPathNodeIterator addNodes = root.Select("modify-attr[@attr-name='Grupo']/add-value/value");
             while (addNodes.MoveNext())
             {
                 if (!string.IsNullOrWhiteSpace(addNodes.Current?.Value))

@@ -24,10 +24,10 @@ class Program
             string password = "admin123";
 
             // Cria o identificador do servidor LDAP
-            var identifier = new LdapDirectoryIdentifier(ldapServer, ldapPort);
+            LdapDirectoryIdentifier identifier = new LdapDirectoryIdentifier(ldapServer, ldapPort);
 
             // Cria as credenciais de autenticação
-            var credential = new NetworkCredential(bindDn, password);
+            NetworkCredential credential = new NetworkCredential(bindDn, password);
 
             // Cria a conexão LDAP
             connection = new LdapConnection(identifier, credential);
@@ -41,25 +41,25 @@ class Program
 
             Console.WriteLine("Conexão LDAP realizada com sucesso.");
 
-            var parser = new XmlParser();
+            XmlParser parser = new XmlParser();
             parser.ProcessXmlFiles();
             Console.WriteLine("Processamento de XMLs concluído.");
-            
-            var ldapService = new LdapService(connection);
 
-            foreach (var group in parser.Groups)
+            LdapService ldapService = new LdapService(connection);
+
+            foreach (Models.LdapGroup group in parser.Groups)
             {
                 // Criar grupo no LDAP
                 ldapService.CreateGroup(group);
             }
 
-            foreach (var user in parser.Users)
+            foreach (Models.LdapUser user in parser.Users)
             {
                 // Criar usuário no LDAP
                 ldapService.CreateUser(user);
             }
             
-            foreach (var mod in parser.Modifications)
+            foreach (Models.UserModification mod in parser.Modifications)
             {
                 // Modificar usuário no LDAP
                 ldapService.ModifyUserGroups(mod);
